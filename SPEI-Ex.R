@@ -99,39 +99,53 @@ flush(stderr()); flush(stdout())
 
 # Load data
 data(wichita)
-attach(wichita)
-
-# One and tvelwe-months SPI
-spi_1 <- spi(PRCP,1)
-spi_12 <- spi(PRCP,12)
-plot(cbind(spi_1,spi_12))
-# Notice that the first eleven values of spei_12 are NA
 
 # One and tvelwe-months SPEI
-wichita$PET <- thornthwaite(TMED,37.6475)
-spei1 <- spei(PRCP-wichita$PET,1)
-spei12 <- spei(PRCP-wichita$PET,12)
-plot(cbind(spei1,spei12))
+wichita$PET <- thornthwaite(wichita$TMED,37.6475)
+spei1 <- spei(wichita$PRCP-wichita$PET,1)
+spei12 <- spei(wichita$PRCP-wichita$PET,12)
+# not executed
+#spei1
+#summary(spei1)
+#coefficients(spei1)
+par(mfrow=c(2,1))
+plot(spei1)
+plot(spei12,'Wichita')
 
-# Data series not starting in January: define the properties
-# of the time series with ts()
-plot(spei(ts(PRCP-wichita$PET,freq=12,start=c(1900,6)),12))
+# One and tvelwe-months SPI
+spi_1 <- spi(wichita$PRCP,1)
+spi_12 <- spi(wichita$PRCP,12)
+par(mfrow=c(2,1))
+plot(spi_1)
+plot(spi_12)
+
+# Define the properties of the time series with ts()
+plot(spei(ts(wichita$PRCP-wichita$PET,freq=12,start=c(1980,1)),12))
+
+# Time series not starting in January
+plot(spei(ts(wichita$PRCP-wichita$PET,freq=12,start=c(1980,6)),12))
+
+# Using a particular reference period
+plot(spei(ts(wichita$PRCP-wichita$PET,freq=12,start=c(1980,1)),12,
+	ref.start=c(1980,1), ref.end=c(2000,1)))
 
 # Different kernels
-spei24 <- spei(PRCP-wichita$PET,24)
-spei24_gau <- spei(PRCP-wichita$PET,24,kernel=list(type='gaussian',shift=0))
-plot(ts(cbind(spei24,spei24_gau),start=c(1900,1),freq=12))
+spei24 <- spei(wichita$PRCP-wichita$PET,24)
+spei24_gau <- spei(wichita$PRCP-wichita$PET,24,kernel=list(type='gaussian',shift=0))
+par(mfrow=c(2,1))
+plot(spei24,'Rectangular kernel')
+plot(spei24_gau,'Gaussian kernel')
+
 
 # Several time series at a time
 data(balance)
 names(balance)
 bal_spei12 <- spei(balance,12)
-colnames(bal_spei12) <- names(balance)
-plot(ts(bal_spei12[,1:6],start=c(1900,1),freq=12),main='12-month SPEI')
-plot(ts(bal_spei12[,7:11],start=c(1900,1),freq=12),main='12-month SPEI')
+plot(bal_spei12)
 
 
 
+graphics::par(get("par.postscript", pos = 'CheckExEnv'))
 ### * <FOOTER>
 ###
 cat("Time elapsed: ", proc.time() - get("ptime", pos = 'CheckExEnv'),"\n")

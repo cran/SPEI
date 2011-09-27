@@ -18,7 +18,8 @@ function(Tmin, Tmax, U2, Ra=NA, lat=NA, Rs=NA, tsun=NA, CC=NA, ed=NA, Tdew=NA, R
 		na.rm==FALSE) {
 		stop('Error: Data must not contain NAs')
 	}
-	if (length(Ra)==1 & length(lat)!=ncol(as.matrix(Ra))) {
+	#if (length(Ra)==1 & length(lat)!=ncol(as.matrix(Ra))) {
+	if (is.na(Ra[1]) & is.na(lat[1])) {
 		stop('Error: One of Ra or lat must be provided')
 	}
 	if (length(Rs)!=length(Tmin) & length(tsun)!=length(Tmin) & length(CC)!=length(Tmin)) {
@@ -86,7 +87,7 @@ function(Tmin, Tmax, U2, Ra=NA, lat=NA, Rs=NA, tsun=NA, CC=NA, ed=NA, Tdew=NA, R
 
 	# Sunset hour angle (needed if no radiation data is available)
 	if (nrow(as.matrix(Ra))!=n | {nrow(as.matrix(Rs))!=n & nrow(as.matrix(tsun))==n}) {
-		# Note: For the winter months in latitudes >55º or <-55º the following
+		# Note: For the winter months and latitudes higher than 55º the following
 		# equations have limited validity (Allen et al., 1994).
 		# J: number of day in the year (eq. 1.27)
 		J <- as.integer(30.5*c-14.6)
@@ -130,8 +131,9 @@ function(Tmin, Tmax, U2, Ra=NA, lat=NA, Rs=NA, tsun=NA, CC=NA, ed=NA, Tdew=NA, R
 		Rs <- (as+bs*(nN))*Ra
 	}
 	# Rso: clear-sky solar radiation (eq. 1.40)
-	# Note: valid for z<6000 m and low air turbidity
-	if (ncol(as.matrix(z))==ncol(as.matrix(Tmin))) {
+	# Note: mostly valid for z<6000 m and low air turbidity
+	#if (ncol(as.matrix(z))==ncol(as.matrix(Tmin))) {
+	if (!is.na(z)) {
 		Rso <- matrix(0.75+2e-5*z,n,m,byrow=TRUE) * Ra
 	} else {
 		Rso <- (0.75+2e-5*840) * Ra
@@ -143,6 +145,7 @@ function(Tmin, Tmax, U2, Ra=NA, lat=NA, Rs=NA, tsun=NA, CC=NA, ed=NA, Tdew=NA, R
 	# Rn, MJ m-2 d-1 (eq. 1.53)
 	Rn <- (1-alb)*Rs - (ac*Rs/Rso+bc) * (a1+b1*sqrt(ed)) * 4.9e-9 *
 		((273.15+Tmax)^4+(273.15+Tmin)^4)/2
+	Rn[Rs==0] <- 0
 
 	# Soil heat flux density, G
 	# Tpre: mean temperature of the previous month; for the first
@@ -160,9 +163,9 @@ function(Tmin, Tmax, U2, Ra=NA, lat=NA, Rs=NA, tsun=NA, CC=NA, ed=NA, Tdew=NA, R
 
 	# Daily ET0 (eq. 2.18)
 	if (crop=='short') {
-		c1 <- 900; c2 <- 0.34 # short reference crop (e.j. clipped grass, 0.12 m)
+		c1 <- 900; c2 <- 0.34 # short reference crop (e.g. clipped grass, 0.12 m)
 	} else {
-		c1 <- 1600; c2 <- 0.38 # tall reference crop (e.j. alfalfa, 0.5 m)
+		c1 <- 1600; c2 <- 0.38 # tall reference crop (e.g. alfalfa, 0.5 m)
 	}
 	ET0 <- (0.408*Delta*(Rn-G) + gamma*(c1/(T+273))*U2*(ea-ed)) /
 		(Delta + gamma*(1+c2*U2))

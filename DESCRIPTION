@@ -1,6 +1,6 @@
 Package: SPEI
 Type: Package
-Version: 1.0
+Version: 1.1
 Date: 2011-09-27
 Title: Calculation of the Standardised Precipitation-Evapotranspiration
         Index
@@ -20,6 +20,6 @@ License: GPL-2
 URL: http://sac.csic.es/spei
 LazyLoad: yes
 Encoding: UTF-8
-Packaged: 2011-10-17 20:49:48 UTC; sbegueria
+Packaged: 2012-01-25 09:16:00 UTC; sbegueria
 Repository: CRAN
-Date/Publication: 2011-10-18 05:59:42
+Date/Publication: 2012-01-25 13:25:39
