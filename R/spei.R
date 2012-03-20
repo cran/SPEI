@@ -31,10 +31,13 @@ spei <- function(data, scale, kernel=list(type='rectangular',shift=0),
 	}
 
 	if (!is.ts(data)) {
-		data <- ts(as.matrix(data),freq=12)
+		data <- ts(as.matrix(data), frequency = 12)
+	} else {
+		data <- ts(as.matrix(data), frequency=frequency(data), start=start(data))
 	}
 	m <- ncol(data)
 	fr <- frequency(data)
+
 	if (distribution=='Gamma') {
 		coef <- array(NA,c(2,m,fr),list(par=c('alpha','beta'),colnames(data),NULL))
 	}
@@ -169,8 +172,9 @@ summary.spei <- function (object, ...) {
 
 # Plot method
 plot.spei <- function (x, ...) {
+	label <- ifelse(as.character(x$call)[1]=='spei','SPEI','SPI')
 	ser <- ts(as.matrix(x$fitted[-c(1:x$scale),]),
-		end=end(x$fitted),fr=frequency(x$fitted))
+		end=end(x$fitted),frequency=frequency(x$fitted))
 	ser[is.nan(ser-ser)] <- 0
 	se <- ifelse(ser==0,ser,NA)
 	tit <- dimnames(x$coefficients)[2][[1]]
@@ -192,12 +196,12 @@ plot.spei <- function (x, ...) {
 	if (n>1 & n<5) par(mfrow=c(n,1))
 	if (n>1 & n>=5) par(mfrow=c({n+1}%/%2,2))
 	for (i in 1:n) {
-		datt <- ts(c(0,ser[,i],0),freq=frequency(ser),start=ns,end=ne)
+		datt <- ts(c(0,ser[,i],0),frequency=frequency(ser),start=ns,end=ne)
 		datt.pos <- ifelse(datt>0,datt,0)
 		datt.neg <- ifelse(datt<=0,datt,0)
-		plot(datt,type='n',xlab='',ylab='SPEI',main=tit[i])
+		plot(datt,type='n',xlab='',ylab=label,main=tit[i])
 		if (!is.null(x$ref.period)) {
-			k <- ts(5,start=x$ref.period[1,],end=x$ref.period[2,],fr=12)
+			k <- ts(5,start=x$ref.period[1,],end=x$ref.period[2,],frequency=12)
 			k[1] <- k[length(k)] <- -5
 			polygon(k, col='light grey',border=NA,density=20)
  			abline(v=x$ref.period[1,1]+(x$ref.period[1,2]-1)/12,col='grey')

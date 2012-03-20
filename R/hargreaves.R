@@ -23,7 +23,9 @@ function(Tmin, Tmax, Ra=NA, lat=NA, Pre=NA, na.rm=FALSE) {
 	}
 	
 	if (!is.ts(Tmin)) {
-		Tmin <- ts(as.matrix(Tmin),freq=12)
+		Tmin <- ts(as.matrix(Tmin),frequency=12)
+	} else {
+		Tmin <- ts(as.matrix(Tmin),frequency=frequency(Tmin),start=start(Tmin))
 	}
 	n <- nrow(Tmin)
 	m <- ncol(Tmin)

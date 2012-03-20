@@ -92,7 +92,7 @@ flush(stderr()); flush(stdout())
 
 ### Name: Drought indices
 ### Title: Calculation of the Standardized Precipitation-Evapotranspiration
-###   Index (SPEI) and the Standardized Precipitation Index (SPI).
+###   Index
 ### Aliases: spei spi
 
 ### ** Examples

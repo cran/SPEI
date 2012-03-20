@@ -16,6 +16,14 @@
 %LazyLoad: \tab yes\cr
 %}
 Functions \code{\link{spei}} and \code{\link{spi}} are the workhorse of the SPEI library. Other functions such as \code{\link{kern}}, \code{\link{cdfglo}} or \code{\link{pglo}} are auxiliary low-level functions and they will not be used directly by the typical user. Functions for computing potential evapotranspiration are provided, too, for helping computing the SPEI. They are: \code{\link{thornthwaite}}, \code{\link{hargreaves}} and \code{\link{penman}}.
+
+Version history:
+
+1.2. A bug causing several functions to fail when a time series not belonging to matrix class was provided was fixed. Function \code{\link{plot.spei}} now distinguises between calls to spei and spi and labels the axis accordingly .
+
+1.1. Functions \code{\link{spei}} and \code{\link{spi}} now yield an object of class "spei". New functions for summarizing and plotting "spei" objects are provided. An option to establish a reference period for the computation of the indices has been implemented in functions \code{\link{spei}} and \code{\link{spi}}.
+
+1.0. First release.
 }
 
 \author{

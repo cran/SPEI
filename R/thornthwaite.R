@@ -11,9 +11,9 @@ function(Tave, lat, na.rm=FALSE) {
 	}
 
 	if (!is.ts(Tave)) {
-		Tave <- ts(as.matrix(Tave),freq=12)
+		Tave <- ts(as.matrix(Tave),frequency=12)
 	} else {
-		Tave <- ts(as.matrix(Tave),freq=frequency(Tave),start=start(Tave))
+		Tave <- ts(as.matrix(Tave),frequency=frequency(Tave),start=start(Tave))
 	}
 	PE <- Tave*NA
 	n <- nrow(Tave)

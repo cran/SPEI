@@ -32,7 +32,9 @@ function(Tmin, Tmax, U2, Ra=NA, lat=NA, Rs=NA, tsun=NA, CC=NA, ed=NA, Tdew=NA, R
 	ET0 <- Tmin*NA
 
 	if (!is.ts(Tmin)) {
-		Tmin <- ts(as.matrix(Tmin),freq=12)
+		Tmin <- ts(as.matrix(Tmin),frequency=12)
+	} else {
+		Tmin <- ts(as.matrix(Tmin),frequency=frequency(Tmin),start=start(Tmin))
 	}
 	n <- nrow(Tmin)
 	m <- ncol(Tmin)
