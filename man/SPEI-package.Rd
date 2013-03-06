@@ -19,6 +19,8 @@ Functions \code{\link{spei}} and \code{\link{spi}} are the workhorse of the SPEI
 
 Version history:
 
+1.3. Minor fixes to \code{\link{spei}} and \code{\link{penman}} functions. New option for user-supplied SPEI parameters in the \code{\link{spei}} function. New dataset \code{\link{cabinda}}.
+
 1.2. A bug causing several functions to fail when a time series not belonging to matrix class was provided was fixed. Function \code{\link{plot.spei}} now distinguises between calls to spei and spi and labels the axis accordingly .
 
 1.1. Functions \code{\link{spei}} and \code{\link{spi}} now yield an object of class "spei". New functions for summarizing and plotting "spei" objects are provided. An option to establish a reference period for the computation of the indices has been implemented in functions \code{\link{spei}} and \code{\link{spi}}.

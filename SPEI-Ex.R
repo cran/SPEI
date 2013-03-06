@@ -33,9 +33,17 @@ pen2 <- penman(TMIN,TMAX,AWND,CC=ACSH,lat=37.6475,z=402.6,na.rm=TRUE)
 # Plot them together
 plot(cbind(tho,har,pen,pen2))
 
-
 # Now consider the data started in June 1900
 thornthwaite(ts(TMED,start=c(1900,6),frequency=12),37.6475)
+
+# Comparison with example from Allen et al. (1998), p. 69, fig. 18:
+# Data from Cabinda, Angola (-5.33S, 12.11E, 20 m a.s.l.)
+data(cabinda)
+pen.cab <- penman(cabinda$Tmin,cabinda$Tmax,cabinda$U2,
+	Rs=cabinda$Rs,tsun=cabinda$tsun,RH=cabinda$RH,lat=-5.33,z=20)
+plot(cabinda$ET0,pen.cab)
+abline(0,1,lt='dashed')
+summary(lm(pen.cab~cabinda$ET0))$r.squared
 
 
 
@@ -47,7 +55,7 @@ flush(stderr()); flush(stdout())
 
 ### Name: Datasets
 ### Title: Datasets for illustrating the functions in the SPEI package.
-### Aliases: wichita balance
+### Aliases: wichita balance cabinda
 
 ### ** Examples
 
@@ -92,7 +100,7 @@ flush(stderr()); flush(stdout())
 
 ### Name: Drought indices
 ### Title: Calculation of the Standardized Precipitation-Evapotranspiration
-###   Index
+###   Index (SPEI) and the Standardized Precipitation Index (SPI).
 ### Aliases: spei spi
 
 ### ** Examples
@@ -104,10 +112,15 @@ data(wichita)
 wichita$PET <- thornthwaite(wichita$TMED,37.6475)
 spei1 <- spei(wichita$PRCP-wichita$PET,1)
 spei12 <- spei(wichita$PRCP-wichita$PET,12)
-# not executed
-#spei1
-#summary(spei1)
-#coefficients(spei1)
+
+# Extract information from spei object
+summary(spei1)
+names(spei1)
+spei1$call
+spei1$fitted
+spei1$coefficients
+
+# Plot spei object
 par(mfrow=c(2,1))
 plot(spei1)
 plot(spei12,'Wichita')
@@ -129,19 +142,23 @@ plot(spei(ts(wichita$PRCP-wichita$PET,freq=12,start=c(1980,6)),12))
 plot(spei(ts(wichita$PRCP-wichita$PET,freq=12,start=c(1980,1)),12,
 	ref.start=c(1980,1), ref.end=c(2000,1)))
 
-# Different kernels
+# Using different kernels
 spei24 <- spei(wichita$PRCP-wichita$PET,24)
 spei24_gau <- spei(wichita$PRCP-wichita$PET,24,kernel=list(type='gaussian',shift=0))
 par(mfrow=c(2,1))
 plot(spei24,'Rectangular kernel')
 plot(spei24_gau,'Gaussian kernel')
 
-
-# Several time series at a time
+# Computing several time series at a time
 data(balance)
 names(balance)
 bal_spei12 <- spei(balance,12)
 plot(bal_spei12)
+
+# User provided parameters
+coe <- spei1$coefficients
+dim(coe)
+spei(wichita$PRCP-wichita$PET,1,params=coe)
 
 
 

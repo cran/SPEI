@@ -1,5 +1,10 @@
 # FAO-56 Penman-Monteith reference evapotranspiration (ET_0)
 #
+#TO DO:
+# 1: poner una serie de warnings para informar al usuario en pantalla de las opciones que se
+#    están utilizando en el cálculo.
+# 2: poner un parámetro 'verbose=TRUE' que controle si se desea que la función	
+#    devuelva estos warnings o no.
 penman <-
 function(Tmin, Tmax, U2, Ra=NA, lat=NA, Rs=NA, tsun=NA, CC=NA, ed=NA, Tdew=NA, RH=NA, P=NA, P0=NA, z=NA, crop='short', na.rm=FALSE) {
 
@@ -22,12 +27,22 @@ function(Tmin, Tmax, U2, Ra=NA, lat=NA, Rs=NA, tsun=NA, CC=NA, ed=NA, Tdew=NA, R
 	if (is.na(Ra[1]) & is.na(lat[1])) {
 		stop('Error: One of Ra or lat must be provided')
 	}
+if (!is.na(Ra[1])) {
+	warning('Using user-provided (Ra)')
+}
+
 	if (length(Rs)!=length(Tmin) & length(tsun)!=length(Tmin) & length(CC)!=length(Tmin)) {
 		stop('Error: One of Rs, tsun or CC must be provided')
 	}	
 	if (length(Tmin)!=length(Tmax) | length(Tmin)!=length(U2)) {
 		stop('Error: Data must be of the same lenght')
 	}
+	if (length(P)!=length(Tmax) & is.na(z)) {
+		stop('Error: Elevation above sea level (z) must be specified if P is not provided.')
+	}
+if (is.na(z)) {
+	warning('Specifying the elevation above sea level (z) is highly recommended in order to compute the clear-sky solar radiation.')
+}
 	
 	ET0 <- Tmin*NA
 
@@ -50,11 +65,11 @@ function(Tmin, Tmax, U2, Ra=NA, lat=NA, Rs=NA, tsun=NA, CC=NA, ed=NA, Tdew=NA, R
 	if (nrow(as.matrix(P))!=n) {
 		if (length(P0)==n) {
 			# estimate from sea level pressure (eq. 1.6)
-			#P <- P0 * ((293-0.0065*z)/293)^5.26
 			P <- P0 %*% as.matrix(((293-0.0065*z)/293)^5.26)
 		} else {
 			# assume a constant pressure
-			P  <- matrix(101.3,n,m)
+			P0  <- matrix(101.3,n,m)
+			P <- P0 %*% as.matrix(((293-0.0065*z)/293)^5.26)
 		}
 	}
 
@@ -92,7 +107,11 @@ function(Tmin, Tmax, U2, Ra=NA, lat=NA, Rs=NA, tsun=NA, CC=NA, ed=NA, Tdew=NA, R
 		# Note: For the winter months and latitudes higher than 55º the following
 		# equations have limited validity (Allen et al., 1994).
 		# J: number of day in the year (eq. 1.27)
-		J <- as.integer(30.5*c-14.6)
+		#J <- as.integer(30.5*c-14.6)
+		# more accurate option:
+		mlen <- c(31,28,31,30,31,30,31,31,30,31,30,31)
+		msum <- c(0,31,59,90,120,151,181,212,243,273,302,334)+15
+		J <- msum[c]
 		# delta: solar declination, rad (1 rad = 57.2957795 deg) (eq. 1.25)
 		delta <- 0.409*sin(0.0172*J-1.39)
 		# dr: relative distance Earth-Sun, [] (eq. 1.24)
@@ -146,19 +165,16 @@ function(Tmin, Tmax, U2, Ra=NA, lat=NA, Rs=NA, tsun=NA, CC=NA, ed=NA, Tdew=NA, R
 	alb <- 0.23
 	# Rn, MJ m-2 d-1 (eq. 1.53)
 	Rn <- (1-alb)*Rs - (ac*Rs/Rso+bc) * (a1+b1*sqrt(ed)) * 4.9e-9 *
-		((273.15+Tmax)^4+(273.15+Tmin)^4)/2
+		((273.15+Tmax)^4+(273.15+Tmin)^4)/2	
 	Rn[Rs==0] <- 0
 
 	# Soil heat flux density, G
-	# Tpre: mean temperature of the previous month; for the first
-	# element use the mean of all observations of the same month
-	if (ncol(as.matrix(T))==1) {
-		Tpre <- mean(T,na.rm=na.rm)
-	} else {
-		Tpre <- rbind(colMeans(T[c==c[1],],na.rm=na.rm),T[1:{n-1},])
-	}
-	# (eq. 1.57)
-	G <- 0.07*(T-Tpre)
+	# Using forward / backward differences for the first and last observations,
+	# and central differences for the remaining ones.
+	G <- rep(NA,length(T))
+	G[1] <- 0.14*(T[2]-T[1])
+	G[2:{length(T)-1}] <- 0.07*(T[3:length(T)]-T[1:{length(T)-2}])
+	G[length(T)] <- 0.14*(T[length(T)]-T[length(T)-1])
 
 	# Wind speed at 2m, U2 (eq. 1.62)
 	#U2 <- U2 * 4.85203/log((zz-0.08)/0.015)
@@ -173,7 +189,6 @@ function(Tmin, Tmax, U2, Ra=NA, lat=NA, Rs=NA, tsun=NA, CC=NA, ed=NA, Tdew=NA, R
 		(Delta + gamma*(1+c2*U2))
 
 	# Transform ET0 to mm month-1
-	mlen <- c(31,28.25,31,30,31,30,31,31,30,31,30,31)
 	ET0 <- ifelse(ET0<0,0,ET0)*mlen[c]
 	colnames(ET0) <- rep('ET0_pen',m)
 	

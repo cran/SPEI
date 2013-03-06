@@ -7,7 +7,7 @@ spei <- function(x, y,...) UseMethod('spei')
 # Fit SPEI.
 spei <- function(data, scale, kernel=list(type='rectangular',shift=0),
 	distribution='log-Logistic', fit='ub-pwm', na.rm=FALSE, 
-	ref.start=NULL, ref.end=NULL, x=FALSE, ...) {
+	ref.start=NULL, ref.end=NULL, x=FALSE, params=NULL, ...) {
 
 	require(lmomco)
 
@@ -75,62 +75,85 @@ spei <- function(data, scale, kernel=list(type='rectangular',shift=0),
 		# Loop through the months
 		for (c in (1:fr)) {
 			# Filter month m, excluding NAs
-			f <- seq(c,length(acu),fr)
+			#f <- seq(c,length(acu),fr)
+			f <- which(cycle(acu)==c)
 			f <- f[!is.na(acu[f])]
-			ff <- seq(c,length(acu.pred),fr)
+			#ff <- seq(c,length(acu.pred),fr)
+			ff <- which(cycle(acu.pred)==c)
 			ff <- ff[!is.na(acu.pred[ff])]
-			
 
 			# Monthly series, sorted
 			month <- sort(acu[f])
 
-			if (length(month)==0 | is.na(sd(month,na.rm=TRUE))) {
+			if (length(month)==0) {
 				std[f] <- NA
 				next()
 			}
-		
-			if (fit=='pp-pwm') {
-				pwm <- pwm.pp(month,-0.35,0)
-			} else {
-				pwm <- pwm.ub(month)
-			}
-			lmom <- pwm2lmom(pwm)
-			if (!are.lmom.valid(lmom) | is.nan(sum(lmom[[1]]))) {
-				next()
-			}
-	
-			if (distribution=='log-Logistic') {
-				# Fit a generalized log-Logistic distribution
-				llpar <- parglo(lmom)
-				if (fit=='max-lik') {
-					llpar <- parglo.maxlik(month,llpar$para)
-				}
-				# Compute standardized values
-				std[ff,s] <- qnorm(pglo(acu.pred[ff],llpar))
-				coef[,s,c] <- llpar$para
-			} else {
-				# Probability of monthly precipitation = 0 (pze)
-				zeros <- sum(month==0)
-				pze <- sum(month==0)/length(month)
-# 				month <- sort(month)
-				if (distribution =='Gamma') {
-					# Fit a Gamma distribution
-					gampar <- pargam(lmom.ub(month))
-					# Compute standardized values
-					std[ff,s] <- qnorm(cdfgam(acu.pred[ff],gampar))
-					std[ff,s] <- qnorm(pze + (1-pze)*pnorm(std[ff,s]))
-					coef[,s,c] <- gampar$para
-				} else if (distribution =='PearsonIII') {
-					# Fit a PearsonIII distribution
-					p3par <- parpe3(lmom.ub(month))
-					# Compute standardized values
-					std[ff,s] <- qnorm(cdfpe3(acu.pred[ff],p3par))
-					std[ff,s] <- qnorm(pze + (1-pze)*pnorm(std[ff,s]))
-					coef[,s,c] <- parpe3$para
-				} # end if
-			} # end if
-		} # next c (month)
 
+			if (is.null(params)) {
+				if (is.na(sd(month,na.rm=TRUE))) {
+					std[f] <- NA
+					next()
+				}
+				if (fit=='pp-pwm') {
+					pwm <- pwm.pp(month,-0.35,0)
+				} else {
+					pwm <- pwm.ub(month)
+				}
+				lmom <- pwm2lmom(pwm)
+	 					if (!are.lmom.valid(lmom) | is.na(sum(lmom[[1]])) | is.nan(sum(lmom[[1]]))) {
+					next()
+				}
+				if (distribution=='log-Logistic') {
+					# Fit a generalized log-Logistic distribution
+					llpar <- parglo(lmom)
+					if (fit=='max-lik') {
+						llpar <- parglo.maxlik(month,llpar$para)
+					}
+					# Compute standardized values
+					std[ff,s] <- qnorm(pglo(acu.pred[ff],llpar))
+					coef[,s,c] <- llpar$para
+				} else {
+					# Probability of monthly precipitation = 0 (pze)
+					zeros <- sum(month==0)
+					pze <- sum(month==0)/length(month)
+					if (distribution =='Gamma') {
+						# Fit a Gamma distribution
+						gampar <- pargam(lmom.ub(month))
+						# Compute standardized values
+						std[ff,s] <- qnorm(cdfgam(acu.pred[ff],gampar))
+						std[ff,s] <- qnorm(pze + (1-pze)*pnorm(std[ff,s]))
+						coef[,s,c] <- gampar$para
+					} else if (distribution =='PearsonIII') {
+						# Fit a PearsonIII distribution
+						p3par <- parpe3(lmom.ub(month))
+						# Compute standardized values
+						std[ff,s] <- qnorm(cdfpe3(acu.pred[ff],p3par))
+						std[ff,s] <- qnorm(pze + (1-pze)*pnorm(std[ff,s]))
+						coef[,s,c] <- p3par$para
+					} # end if
+				} # end if
+			} else {
+				if (dim(params)[1]!=3 & dim(params)[2]!=m & dim(params)[3]!=12) {
+					stop(paste('params should be an array with dimensions (3,',m,',12)',sep=' '))
+				}
+				coef[,s,c] <- params[,s,c]
+				if (distribution=='log-Logistic') {
+					std[ff,s] <- qnorm(pglo(acu.pred[ff],
+						list(type="glo", para=params[,s,c], source="user")))
+				} else {
+					if (distribution =='Gamma') {
+						std[ff,s] <- qnorm(cdfgam(acu.pred[ff],
+							list(type="gam", para=params[,s,c], source="user")))
+						std[ff,s] <- qnorm(pze + (1-pze)*pnorm(std[ff,s]))
+					} else if (distribution =='PearsonIII') {
+						std[ff,s] <- qnorm(cdfpe3(acu.pred[ff],
+							list(type="pe3", para=params[,s,c], source="user")))
+						std[ff,s] <- qnorm(pze + (1-pze)*pnorm(std[ff,s]))
+					}					
+				}
+			}
+		} # next c (month)
 		#std[is.nan(std[,s]) | is.nan(std[,s]-std[,s]),s] <- NA
 		#std[,s] <- std[,s]-mean(std[,s],na.rm=TRUE)
 		#std[,s] <- std[,s]/sd(std[,s],na.rm=TRUE)

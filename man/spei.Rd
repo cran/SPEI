@@ -10,11 +10,11 @@
 \usage{
 spei(data, scale, kernel = list(type = 'rectangular', shift = 0),
 	distribution = 'log-Logistic', fit = 'ub-pwm', na.rm = FALSE,
-	ref.start=NULL, ref.end=NULL, x=FALSE, ...)
+	ref.start=NULL, ref.end=NULL, x=FALSE, params=NULL, ...)
 
 spi(data, scale, kernel = list(type = 'rectangular', shift = 0),
 	distribution = 'Gamma', fit = 'ub-pwm', na.rm = FALSE,
-	ref.start=NULL, ref.end=NULL, x=FALSE, ...)
+	ref.start=NULL, ref.end=NULL, x=FALSE, params=NULL, ...)
 }
 
 \arguments{
@@ -27,6 +27,7 @@ spi(data, scale, kernel = list(type = 'rectangular', shift = 0),
   \item{ref.start}{ optional, starting point of the reference period used for computing the index. Defaults to NULL, indicating that the first value in data will be used as starting point.}
   \item{ref.end}{ optional, ending point of the reference period used for computing the index. Defaults to NULL, indicating that the last value in data will be used as ending point.}
   \item{x}{ optional, a logical value indicating wether the data used for fitting the model should be kept. Defaults to FALSE.}
+  \item{params}{ optional, an array of parameters for computing the spei. This option overrides computation of fitting parameters.}
   \item{...}{ other parameters to be passed.}
 }
 
@@ -40,6 +41,8 @@ An important advantage of the SPEI and the SPI is that they can be computed at d
 Following the original definitions \code{spei} uses a log-Logistic distribution by default, and \code{spi} uses a Gamma distribution. This behaviour can be modified, however, through parameter \code{distribution}.
 
 The default method for parameter fitting is based on unbiased Probability Weighted Moments ('ub-pwm'), but other methods can be used through parameter \code{fit}. Valid aleternatives are the plotting-position PWM ('pp-pwm') and the maximum likelihood method ('max-lik').
+
+An option exists to override parameter fitting and provide user default parameters. This is activated with the parameter \code{params}, which should be a three-dimensional array with dimensions (3,number of series (usually 1),12). Twelve parameter triads (xi, alpha, kappa) should be provided for each data series, one for each month. The parameter \code{distribution} is still used under this option in order to know what distribution function should be used.
 
 The default behaviour of the functions is using all the values provided in \code{data} for parameter fitting. However, this can be modified with help of parameters \code{ref.start} and \code{ref.end}. These parameters allow defining a subset of values that will be used for parameter fitting, i.e. a reference period. The functions, however, will compute the values of the indices for the whole data set. For these options to work it is necessary that \code{data} will be a time series object. The starting and ending points of the reference period will then be defined as pairs of year and month values, e.g. c(1900,1).
 }
@@ -90,10 +93,15 @@ data(wichita)
 wichita$PET <- thornthwaite(wichita$TMED,37.6475)
 spei1 <- spei(wichita$PRCP-wichita$PET,1)
 spei12 <- spei(wichita$PRCP-wichita$PET,12)
-# not executed
-#spei1
-#summary(spei1)
-#coefficients(spei1)
+
+# Extract information from spei object
+summary(spei1)
+names(spei1)
+spei1$call
+spei1$fitted
+spei1$coefficients
+
+# Plot spei object
 par(mfrow=c(2,1))
 plot(spei1)
 plot(spei12,'Wichita')
@@ -115,19 +123,23 @@ plot(spei(ts(wichita$PRCP-wichita$PET,freq=12,start=c(1980,6)),12))
 plot(spei(ts(wichita$PRCP-wichita$PET,freq=12,start=c(1980,1)),12,
 	ref.start=c(1980,1), ref.end=c(2000,1)))
 
-# Different kernels
+# Using different kernels
 spei24 <- spei(wichita$PRCP-wichita$PET,24)
 spei24_gau <- spei(wichita$PRCP-wichita$PET,24,kernel=list(type='gaussian',shift=0))
 par(mfrow=c(2,1))
 plot(spei24,'Rectangular kernel')
 plot(spei24_gau,'Gaussian kernel')
 
-
-# Several time series at a time
+# Computing several time series at a time
 data(balance)
 names(balance)
 bal_spei12 <- spei(balance,12)
 plot(bal_spei12)
+
+# User provided parameters
+coe <- spei1$coefficients
+dim(coe)
+spei(wichita$PRCP-wichita$PET,1,params=coe)
 }
 
 %\keyword{}

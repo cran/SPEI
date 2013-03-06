@@ -65,6 +65,8 @@ Droogers P., Allen R. G., 2002. Estimating reference evapotranspiration under in
 
 Allen R. G., Smith M., Pereira L. S., Perrier A., 1994. An update for the calculation of reference evapotranspiration. \emph{ICID Bulletin of the International Commission on Irrigation and Drainage}, 35–92.
 
+Allen R.G., Pereira L.S.,Raes D., Smith, M. 1998. \emph{JCrop evapotranspiration - Guidelines for computing crop water requirements - FAO Irrigation and drainage paper 56}. FAO, Rome. ISBN 92-5-104219-5.
+
 Walter I.A. and 14 co-authors, 2002. The ASCE standardized reference evapotranspiration equation. Rep. Task Com. on Standardized Reference Evapotranspiration July 9, 2002, EWRI–Am. Soc. Civil Engr., Reston, VA, 57 pp.
 }
 
@@ -92,9 +94,17 @@ pen2 <- penman(TMIN,TMAX,AWND,CC=ACSH,lat=37.6475,z=402.6,na.rm=TRUE)
 # Plot them together
 plot(cbind(tho,har,pen,pen2))
 
-
 # Now consider the data started in June 1900
 thornthwaite(ts(TMED,start=c(1900,6),frequency=12),37.6475)
+
+# Comparison with example from Allen et al. (1998), p. 69, fig. 18:
+# Data from Cabinda, Angola (-5.33S, 12.11E, 20 m a.s.l.)
+data(cabinda)
+pen.cab <- penman(cabinda$Tmin,cabinda$Tmax,cabinda$U2,
+	Rs=cabinda$Rs,tsun=cabinda$tsun,RH=cabinda$RH,lat=-5.33,z=20)
+plot(cabinda$ET0,pen.cab)
+abline(0,1,lt='dashed')
+summary(lm(pen.cab~cabinda$ET0))$r.squared
 }
 
 %\keyword{}
