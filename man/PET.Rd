@@ -24,21 +24,21 @@ penman(Tmin, Tmax, U2, Ra = NA, lat = NA, Rs = NA, tsun = NA,
 
 \arguments{
   \item{Tave}{ a numeric vector, matrix or time series of monthly mean temperatures, ºC.}
-  \item{lat}{ a numeric vector with the latitude of the site or sites, in degrees.}
+  \item{lat}{ a numeric vector with the latitude of the site, in degrees.}
   \item{na.rm}{ optional, a logical value indicating whether NA values should be stripped from the computations.}
   \item{Tmax}{ a numeric vector, matrix or time series of monthly mean daily maximum temperatures, ºC.}
   \item{Tmin}{ a numeric vector, matrix or time series of monthly mean daily minimum temperatures, ºC.}
   \item{Ra}{ optional, a numeric vector, matrix or time series of monthly mean daily external radiation, MJ m-2 d-1.}
-  \item{Pre}{ optional, a numeric vector, matrix or time series  of monthly total precipitations, mm.}
+  \item{Pre}{ optional, a numeric vector, matrix or time series  of monthly total precipitation, mm.}
   \item{U2}{ a numeric vector, matrix or time series of monthly mean daily wind speeds at 2 m height, m s-1.} 
   \item{Rs}{ optional, a numeric vector, matrix or time series of monthly mean dialy incoming solar radiation, MJ m-2 d-1.} 
   \item{tsun}{ optional, a numeric vector, matrix or time series of monthly mean daily bright sunshine hours, h.} 
   \item{CC}{ optional, numeric a vector, matrix or time series of monthly mean cloud cover, \%.}
-  \item{ed}{ optional, numeric a vector, matrix or time series of monthly mean saturation vapour pressure (vapour pressure at dew point) at 2 m height, kPa.}
-  \item{Tdew}{ optional, a numeric vector, matrix or time series of monthly mean daily dewpoint temperature, ºC}
-  \item{RH}{ optional, a numeric vector, matrix or time series of monthly mean relative humidity, \%.}
+  \item{ed}{ optional, numeric a vector, matrix or time series of monthly mean actual vapour pressure at 2 m height, kPa.}
+  \item{Tdew}{ optional, a numeric vector, matrix or time series of monthly mean daily dewpoint temperature (used for estimating ed), ºC}
+  \item{RH}{ optional, a numeric vector, matrix or time series of monthly mean relative humidity (used for estimating ed), \%.}
   \item{P}{ optional, a numeric vector, matrix or time series of monthly mean atmospheric pressure at surface, kPa.}
-  \item{P0}{ optional, a numeric vector, matrix or time series of monthly mean atmospheric pressure at sea level, kPa.}
+  \item{P0}{ optional, a numeric vector, matrix or time series of monthly mean atmospheric pressure at sea level (used for estimating P), kPa.}
   \item{z}{ optional, a numeric vector of the elevation of the site or sites, m above sea level.}
   \item{crop}{ optional, character string, type of reference crop. Either one of 'short' (default) or 'tall'.}
 }

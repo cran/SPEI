@@ -5,6 +5,7 @@
 #    están utilizando en el cálculo.
 # 2: poner un parámetro 'verbose=TRUE' que controle si se desea que la función	
 #    devuelva estos warnings o no.
+# 3: versión para datos diarios (existe una versión ya, colgada en mi blog).
 penman <-
 function(Tmin, Tmax, U2, Ra=NA, lat=NA, Rs=NA, tsun=NA, CC=NA, ed=NA, Tdew=NA, RH=NA, P=NA, P0=NA, z=NA, crop='short', na.rm=FALSE) {
 
@@ -77,11 +78,11 @@ if (is.na(z)) {
 	gamma <- 1.63e-3*P/lambda
 
 	# 6. Saturation vapour pressure, ea
-	# saturation vapour pressure at tmx (eq. 1.10)
+	# saturation vapour pressure at tmx (eq. 1.10, p. 66)
 	etmx <- 0.611*exp((17.27*Tmax)/(Tmax+237.3))
-	# saturation vapour pressure at tmn (eq. 1.10)
+	# saturation vapour pressure at tmn (eq. 1.10, p. 66)
 	etmn <- 0.611*exp((17.27*Tmin)/(Tmin+237.3))
-	# (eq. 1.11)
+	# mean saturation vapour pressure (eq. 1.11, p. 67)
 	ea <- (etmx+etmn)/2
 
 	# 2. Slope of the saturation vapour pressure function, Delta (eq. 1.3)
@@ -91,13 +92,13 @@ if (is.na(z)) {
 	# 7. Actual vapour pressure, ed
 	if(length(ed)!=n) {
 		if (length(Tdew)==n) {
-			# (eq. 1.12)
+			# (eq. 1.12, p. 67)
 			ed <- 0.611*exp((17.27*Tdew)/(Tdew+237.3))
-		}else if(length(RH)==n) {
-			# (eq. 1.16)
+		} else if(length(RH)==n) {
+			# (eq. 1.16, p. 68)
 			ed <- RH / ((50/etmn)+(50/etmx))
 		} else {
-			# (eq. 1.19)
+			# (eq. 1.19, p. 69)
 			ed <- etmn
 		}
 	}

@@ -10,7 +10,7 @@
 %\tabular{ll}{
 %Package: \tab SPEI\cr
 %Type: \tab Package\cr
-%Version: \tab 1.1\cr
+%Version: \tab 1.4\cr
 %Date: \tab 2011-26-09\cr
 %License: \tab GPL version 2 or newer\cr
 %LazyLoad: \tab yes\cr
@@ -18,6 +18,8 @@
 Functions \code{\link{spei}} and \code{\link{spi}} are the workhorse of the SPEI library. Other functions such as \code{\link{kern}}, \code{\link{cdfglo}} or \code{\link{pglo}} are auxiliary low-level functions and they will not be used directly by the typical user. Functions for computing potential evapotranspiration are provided, too, for helping computing the SPEI. They are: \code{\link{thornthwaite}}, \code{\link{hargreaves}} and \code{\link{penman}}.
 
 Version history:
+
+1.4. Minor fixes to functions \code{\link{penman}} and \code{\link{pwm}}. Documentation of the penman function defined by mistake ed as the saturation vapour pressure, while it should read 'actual vapour pressure'. Function zzz.R added to display basic information about the SPEI package at startup. Function \code{\link{SPEINews}} added to display the NEWS file.
 
 1.3. Minor fixes to \code{\link{spei}} and \code{\link{penman}} functions. New option for user-supplied SPEI parameters in the \code{\link{spei}} function. New dataset \code{\link{cabinda}}.
 
