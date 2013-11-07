@@ -21,30 +21,50 @@ spi(data, scale, kernel = list(type = 'rectangular', shift = 0),
   \item{data}{ a vector, matrix or data frame with time ordered values of precipitation (for the SPI) or of the climatic balance precipitation minus potential evapotranspiration (for the SPEI).}
   \item{scale}{ an integer, representing the time scale at which the SPEI / SPI will be computed.}
   \item{kernel}{ optional, a list defining the type of kernel used for computing the SPEI / SPI at scales higher than one. Defaults to unshifted rectangular kernel.}
-  \item{distribution}{ optional, name of the distribution function to be used for computing the SPEI / SPI (one of 'log-Logistic', 'Gamma' and 'PearsonIII'). Defaults to 'log-Logistic'.}
+  \item{distribution}{ optional, name of the distribution function to be used for computing the SPEI / SPI (one of 'log-Logistic', 'Gamma' and 'PearsonIII'). Defaults to 'log-Logistic' for \code{spei}, and to 'Gamma' for \code{spi}.}
   \item{fit}{ optional, name of the method used for computing the distribution function parameters (one of 'ub-pwm', 'pp-pwm' and 'max-lik'). Defaults to 'ub-pwm'.}
   \item{na.rm}{ optional, a logical value indicating whether NA values should be stripped from the computations. Defaults to FALSE, i.e. no NA are allowed in the data.}
   \item{ref.start}{ optional, starting point of the reference period used for computing the index. Defaults to NULL, indicating that the first value in data will be used as starting point.}
   \item{ref.end}{ optional, ending point of the reference period used for computing the index. Defaults to NULL, indicating that the last value in data will be used as ending point.}
   \item{x}{ optional, a logical value indicating wether the data used for fitting the model should be kept. Defaults to FALSE.}
   \item{params}{ optional, an array of parameters for computing the spei. This option overrides computation of fitting parameters.}
-  \item{...}{ other parameters to be passed.}
+  \item{...}{ other possible parameters.}
 }
 
 \details{
-The \code{spei} and \code{spi} functions allow computing the SPEI and the SPI indices. These are widely used for drought identification and monitoring. Both functions are identical (in fact, \code{spi} is just a wrapper for \code{spei}), but they are kept separated for clarity. Basically, the functions standardize a variable following a log-Logistic distribution function (i.e., they transform it to a standard Gaussian variate with zero mean and standard deviation of one). The input variable is a time ordered series of precipitation values for \code{spi}, and a series of the climate water balance (precipitation minus potential evapotranspiration) for \code{spei}. When used with the default options, they yield values of both indices as defined in the references given below.
+
+The \code{spei} and \code{spi} functions allow computing the SPEI and the SPI indices. These are climatic proxies widely used for drought quantification and monitoring. Both functions are identical (in fact, \code{spi} is just a wrapper for \code{spei}), but they are kept separated for clarity. Basically, the functions standardize a variable following a log-Logistic (or Gamma, or PearsonIII) distribution function (i.e., they transform it to a standard Gaussian variate with zero mean and standard deviation of one).
+
+\subsection{Input data}{
+The input variable is a time ordered series of precipitation values for \code{spi}, or a series of the climatic water balance (precipitation minus potential evapotranspiration) for \code{spei}. When used with the default options, it would yield values of both indices exactly as defined in the references given below.
 
 The SPEI and the SPI were defined for monthly data. Since the PDFs of the data are not homogenous from month to month, the data is split into twelve series (one for each month) and independent PDFs are fit to each series. If \code{data} is a vector or a matrix it will be treated as a sequence of monthly values starting in January. If it is a (univariate or multivariate) time series then the function \code{\link{cycle}} will be used to determine the position of each observation within the year (month), allowing the data to start in a month other than January.
+}
 
-An important advantage of the SPEI and the SPI is that they can be computed at different time scales. This means that it is possible to incorporate the influence of the past values of the variable in its computation, enabling the index to adapt to the memory of the system under study. The magnitude of this memory is controlled by parameter \code{scale}: for example, a value of six would imply that data from the current month and of the past five months will be used for computing the SPEI or SPI value for a given month. By default all past data will have the same weight in computing the index, as it was originally proposed by the authors. Other kernels, however, are available through parameter \code{kernel}. The parameter \code{kernel} is a list defining the shape of the kernel and a time shift. For more details refer to  the function \code{\link{kern}}.
+\subsection{Time scales}{
+An important advantage of the SPEI and the SPI is that they can be computed at different time scales. This way it is possible to incorporate the influence of the past values of the variable in the computation enabling the index to adapt to the memory of the system under study. The magnitude of this memory is controlled by parameter \code{scale}. For example, a value of six would imply that data from the current month and of the past five months will be used for computing the SPEI or SPI value for a given month. By default all past data will have the same weight in computing the index, as it was originally proposed in the references below. Other kernels, however, are available through parameter \code{kernel}. The parameter \code{kernel} is a list defining the shape of the kernel and a time shift. These parameters are then passed to the function \code{\link{kern}}.
+}
 
+\subsection{Probability distributions}{
 Following the original definitions \code{spei} uses a log-Logistic distribution by default, and \code{spi} uses a Gamma distribution. This behaviour can be modified, however, through parameter \code{distribution}.
+}
 
-The default method for parameter fitting is based on unbiased Probability Weighted Moments ('ub-pwm'), but other methods can be used through parameter \code{fit}. Valid aleternatives are the plotting-position PWM ('pp-pwm') and the maximum likelihood method ('max-lik').
+\subsection{Fitting methods}{
+The default method for parameter fitting is based on unbiased Probability Weighted Moments ('ub-pwm'), but other methods can be used through parameter \code{fit}. A valid alternative is the plotting-position PWM ('pp-pwm') method. For the log-Logistic distribution, also the maximum likelihood method ('max-lik') is available.
+}
 
-An option exists to override parameter fitting and provide user default parameters. This is activated with the parameter \code{params}, which should be a three-dimensional array with dimensions (3,number of series (usually 1),12). Twelve parameter triads (xi, alpha, kappa) should be provided for each data series, one for each month. The parameter \code{distribution} is still used under this option in order to know what distribution function should be used.
+\subsection{User-provided parameters}{
+An option exists to override parameter fitting and provide user default parameters. This is activated with the parameter \code{params}. The exact values provided tothis parameter depend on the distribution function being used. For log-Logistic and PearsonII it should be a three-dimensional array with dimensions (3,number of series in data,12), containing twelve parameter triads (xi, alpha, kappa) for each data series, one for each month. For Gamma, a three-dimensional array with dimensions (2,number of series in data,12), containing twelve parameter pairs (alpha, beta). It is a good idea to look at the coefficients slot of a previously fit \code{spei} spei object in order to understand the structure of the parameter array. The parameter \code{distribution} is still used under this option in order to know what distribution function should be used.
+}
 
+\subsection{Reference period}{
 The default behaviour of the functions is using all the values provided in \code{data} for parameter fitting. However, this can be modified with help of parameters \code{ref.start} and \code{ref.end}. These parameters allow defining a subset of values that will be used for parameter fitting, i.e. a reference period. The functions, however, will compute the values of the indices for the whole data set. For these options to work it is necessary that \code{data} will be a time series object. The starting and ending points of the reference period will then be defined as pairs of year and month values, e.g. c(1900,1).
+}
+
+\subsection{Processing large datasets}{
+It is possible to use the \code{spei} and \code{spi} functions for processing multivariate datasets at once. If a matrix or data frame is supplied as \code{data}, with time series of precipitation or precipitation minus potential evapotranspiration arranged in columns, the result would be a matrix (data frame) of spi or spei series. This makes processing large datasets extremely easy, since no loops need to be used.
+}
+
 }
 
 \value{
@@ -78,7 +98,7 @@ S.M. Vicente-Serrano, S. Beguería, J.I. López-Moreno. 2010. A Multi-scalar dro
 }
 
 \author{
-Santiago Beguería and Sergio M. Vicente-Serrano. Maintainer: Santiago Beguería
+Santiago Beguería and Sergio M. Vicente-Serrano. Maintainer: Santiago Beguería.
 }
 
 \note{Dependencies: the spei function depends on the library \code{lmomco}.}

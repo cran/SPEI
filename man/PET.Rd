@@ -24,7 +24,7 @@ penman(Tmin, Tmax, U2, Ra = NA, lat = NA, Rs = NA, tsun = NA,
 
 \arguments{
   \item{Tave}{ a numeric vector, matrix or time series of monthly mean temperatures, ºC.}
-  \item{lat}{ a numeric vector with the latitude of the site, in degrees.}
+  \item{lat}{ a numeric vector with the latitude of the site or sites, in degrees.}
   \item{na.rm}{ optional, a logical value indicating whether NA values should be stripped from the computations.}
   \item{Tmax}{ a numeric vector, matrix or time series of monthly mean daily maximum temperatures, ºC.}
   \item{Tmin}{ a numeric vector, matrix or time series of monthly mean daily minimum temperatures, ºC.}
