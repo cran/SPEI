@@ -1,8 +1,7 @@
 Package: SPEI
 Type: Package
-Version: 1.7
-Date: 2017-06-07
-Title: Calculation of the Standardised Precipitation-Evapotranspiration
+Version: 1.8.0
+Title: Calculation of the Standardized Precipitation-Evapotranspiration
         Index
 Authors@R: c(
 	person('Santiago', 'Beguería', role=c('aut','cre'),
@@ -10,15 +9,21 @@ Authors@R: c(
 	person(c('Sergio','M.'), 'Vicente-Serrano', role='aut',
 	email='svicen@ipe.csic.es'))
 Description: A set of functions for computing potential evapotranspiration and several widely used drought indices including the Standardized Precipitation-Evapotranspiration Index (SPEI).
-Depends: lmomco, parallel, ggplot2
+Depends: R (>= 3.5.0)
+Imports: lmomco, lmom, TLMoments, reshape, ggplot2, checkmate, zoo,
+        lubridate
 License: GPL-2
-URL: http://sac.csic.es/spei
-LazyLoad: yes
+URL: https://spei.csic.es, https://github.com/sbegueria/SPEI
+Language: en-US
+BugReports: https://github.com/sbegueria/SPEI/issues
+LazyLoad: true
 Encoding: UTF-8
+Suggests: covr, testthat
+RoxygenNote: 7.2.3
 NeedsCompilation: no
-Packaged: 2017-06-07 11:38:24 UTC; sbegueria
+Packaged: 2023-01-20 11:05:00 UTC; sbegueria
 Author: Santiago Beguería [aut, cre],
   Sergio M. Vicente-Serrano [aut]
 Maintainer: Santiago Beguería <santiago.begueria@csic.es>
 Repository: CRAN
-Date/Publication: 2017-06-07 17:24:09 UTC
+Date/Publication: 2023-01-20 17:40:09 UTC
