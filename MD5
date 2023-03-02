@@ -1,4 +1,4 @@
-0eb6280d67fda0d9b44766a73a98328a *DESCRIPTION
+2682a41eb6687c4bc0c7eea34896d596 *DESCRIPTION
 c4ca52a90828413fd206c8cdfa904aef *NAMESPACE
 7e5387f1e7ca3c789f5d38782ea6145f *NEWS.md
 059cce39bbf06be93463845a8b389f7a *R/SPEI-package.r
@@ -85,7 +85,6 @@ d97b81a302945be6f06b816adcbe6135 *tests/testthat/data/spi_refst.rds
 eff15bdfd06710b435a3f7138607b24f *tests/testthat/test_hargreaves.R
 83e1d175de8404df281ab97eb67b5dce *tests/testthat/test_kern.R
 cdd04236c9fea1d8c638e71c2691f4c2 *tests/testthat/test_penman.R
-d31f44bd73bf22871b97d30e0e014b8b *tests/testthat/test_spei.R
-4c00a1347499244bdc8257afac8d0b9f *tests/testthat/test_spi.R
+fea7db01117f00d2eeebe76b07c2d5c7 *tests/testthat/test_spei.R
+e612a79f3d6b06bb314c9583fe78694e *tests/testthat/test_spi.R
 2689061c21a943b500ec3f8a0b1be2b3 *tests/testthat/test_thornthwaite.R
-cf08277848582f1277320aa8f6810296 *tests/testthat/testthat-problems.rds
